@@ -3,8 +3,13 @@ equinox-config-builder
 
 Simple utility allowing to generate config.ini file from an "eclipse" directory.
 
+Build status
+------------
 
-usage
+[![Build Status](https://api.travis-ci.org/dgageot/simplelenium.png)](https://travis-ci.org/dgageot/simplelenium)
+
+
+Usage
 -----
 
 	java -jar equinox-config-builder-<version>.jar <eclipseDirectory> [<defaultStartLevel> [<bundleStartLevelsPropertyFile>]]
