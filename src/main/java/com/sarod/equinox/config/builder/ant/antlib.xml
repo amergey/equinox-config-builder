@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<antlib>
+
+	<taskdef name="equinox-config-builder"
+		classname="com.sarod.equinox.config.builder.ant.EquinoxConfigBuilderTask" />
+	<typedef name="bundlestartlevel"
+		classname="com.sarod.equinox.config.builder.ant.BundleStartLevel" />
+
+</antlib>

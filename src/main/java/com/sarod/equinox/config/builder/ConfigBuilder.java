@@ -3,6 +3,7 @@ package com.sarod.equinox.config.builder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,9 +28,23 @@ public final class ConfigBuilder {
 
 	private BundleInfoLoader bundleInfoLoader;
 
-	public static Map<String, Integer> startLevelsMapFromProperties(Properties bundleStartLevels) {
+	public static Map<String, Integer> startLevelsMapFromPropertyFile(File bundleStartLevelsPropertyFile) {
+		Properties bundleStartLevelsProperties = new Properties();
+		FileInputStream fis = null;
+		try {
+			fis = new FileInputStream(bundleStartLevelsPropertyFile);
+			bundleStartLevelsProperties.load(fis);
+			return startLevelsMapFromProperties(bundleStartLevelsProperties);
+		} catch (IOException e) {
+			throw new ConfigBuildingException("Error loading bundleStartLevelsPropertyFile: " +bundleStartLevelsPropertyFile, e);
+		} finally {
+			IOUtils.closeQuietly(fis);
+		}
+	}
+
+	public static Map<String, Integer> startLevelsMapFromProperties(Properties bundleStartLevelsProperties) {
 		Map<String, Integer> bundleStartLevelsMap = new HashMap<String, Integer>();
-		for (Map.Entry<Object, Object> entry : bundleStartLevels.entrySet()) {
+		for (Map.Entry<Object, Object> entry : bundleStartLevelsProperties.entrySet()) {
 			try {
 				int startLevel = Integer.parseInt((String) entry.getValue());
 				bundleStartLevelsMap.put((String) entry.getKey(), startLevel);
@@ -99,7 +114,7 @@ public final class ConfigBuilder {
 		LOGGER.log(Level.INFO, "Generating configuration/config.ini....");
 
 		List<BundleInfo> bundleInfos = loadBundleInfos(pluginsDirectory);
-		
+
 		String configContent = buildConfigContent(bundleInfos);
 
 		File configDirectory = new File(eclipseDirectory, CONFIGURATION_DIR);
@@ -177,7 +192,7 @@ public final class ConfigBuilder {
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 
 		if (args.length < 1) {
 			System.out.println("usage:");
@@ -204,17 +219,10 @@ public final class ConfigBuilder {
 
 		Map<String, Integer> bundleStartLevels;
 		if (args.length >= 3) {
-			Properties bundleStartLevelsProperties = new Properties();
 			File bundleStartLevelsPropertyFile = new File(args[2]);
 			System.out.println("bundleStartLevelsPropertyFile: " + bundleStartLevelsPropertyFile);
-			FileInputStream fis = null;
-			try {
-				fis = new FileInputStream(bundleStartLevelsPropertyFile);
-				bundleStartLevelsProperties.load(fis);
-			} finally {
-				IOUtils.closeQuietly(fis);
-			}
-			bundleStartLevels = startLevelsMapFromProperties(bundleStartLevelsProperties);
+
+			bundleStartLevels = startLevelsMapFromPropertyFile(bundleStartLevelsPropertyFile);
 		} else {
 			bundleStartLevels = Collections.emptyMap();
 		}
