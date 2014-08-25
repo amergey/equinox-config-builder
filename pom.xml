@@ -46,4 +46,7 @@
 	<scm>
 		<url>https://github.com/sarod/equinox-config-builder.git</url>
 	</scm>
+	<ciManagement>
+		<url>https://travis-ci.org/sarod/equinox-config-builder</url>
+	</ciManagement>
 </project>

@@ -24,14 +24,20 @@ public class BundleInfoLoader {
 
 	/**
 	 * Load BundleInfo from a jar file
-	 * @param jarStream
+	 * @param jarInputStream
 	 * @param pluginFileName
 	 * @return
 	 * @throws ConfigBuildingException
 	 */
-	public BundleInfo loadBundleInfo(InputStream jarStream, String pluginFileName) throws ConfigBuildingException {
+	public BundleInfo loadBundleInfo(InputStream jarInputStream, String pluginFileName) throws ConfigBuildingException {
+		if (jarInputStream == null) {
+			throw new NullPointerException("jarInputStreamStream must be not null");
+		}
+		if (pluginFileName == null) {
+			throw new NullPointerException("pluginFileName must be not null");
+		}
 		try {
-			Manifest manifest = loadManifest(jarStream);
+			Manifest manifest = loadManifest(jarInputStream);
 			if (manifest == null) {
 				logger.log(Level.FINE, "No manifest in jar");
 				return null;
@@ -52,6 +58,9 @@ public class BundleInfoLoader {
 	}
 
 	public BundleInfo loadBundleInfo(File jarFile) throws ConfigBuildingException {
+		if (jarFile == null) {
+			throw new NullPointerException("jarFile must be not null");
+		}
 		String pluginFileName = jarFile.getName();
 
 		FileInputStream fis = null;
