@@ -1,21 +1,16 @@
 package com.sarod.equinox.config.builder;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 public final class ConfigBuilder {
 
@@ -23,51 +18,14 @@ public final class ConfigBuilder {
 
 	private static final String CONFIGURATION_DIR = "configuration";
 
-	private static final class BundleInfo implements Comparable<BundleInfo> {
-
-		private final String fileName;
-		private final boolean fragment;
-		private final String bundleName;
-
-		public BundleInfo(String fileName, String bundleName, boolean fragment) {
-			super();
-			this.fileName = fileName;
-			this.bundleName = bundleName;
-			this.fragment = fragment;
-		}
-
-		public String getFileName() {
-			return fileName;
-		}
-
-		public boolean isFragment() {
-			return fragment;
-		}
-
-		public String getBundleName() {
-			return bundleName;
-		}
-
-		@Override
-		public String toString() {
-			return "BundleInfo [fileName=" + getFileName() + ", bundleName=" + getBundleName() + ", fragment=" + isFragment() + "]";
-		}
-
-		public int compareTo(BundleInfo anotherBi) {
-			return bundleName.compareTo(anotherBi.getBundleName());
-		}
-
-	}
-
 	protected final static Logger LOGGER = Logger.getLogger(ConfigBuilder.class.getName());
-
-	private static final String FRAGMENT_HOST = "Fragment-Host";
-	private static final String BUNDLE_SYMBOLIC_NAME = "Bundle-SymbolicName";
 
 	public static final int DEFAULT_DEFAULT_START_LEVEL = 4;
 	private final File eclipseDirectory;
 	private final int defaultStartLevel;
 	private final Map<String, Integer> bundleStartLevels;
+
+	private BundleInfoLoader bundleInfoLoader;
 
 	public static Map<String, Integer> startLevelsMapFromProperties(Properties bundleStartLevels) {
 		Map<String, Integer> bundleStartLevelsMap = new HashMap<String, Integer>();
@@ -112,6 +70,8 @@ public final class ConfigBuilder {
 		}
 		// Defensive copy
 		this.bundleStartLevels = Collections.unmodifiableMap(new HashMap<String, Integer>(bundleStartLevels));
+
+		this.bundleInfoLoader = new BundleInfoLoader();
 	}
 
 	public File getEclipseDirectory() {
@@ -138,16 +98,8 @@ public final class ConfigBuilder {
 
 		LOGGER.log(Level.INFO, "Generating configuration/config.ini....");
 
-		List<BundleInfo> bundleInfos = new ArrayList<BundleInfo>();
-		for (File pluginFile : pluginsDirectory.listFiles()) {
-			BundleInfo bundleInfo = bundleInfo(pluginFile);
-			if (bundleInfo != null) {
-				bundleInfos.add(bundleInfo);
-			}
-		}
-		// Sort bundle infos in alphabetical order to make config.ini more
-		// readable by humans
-		Collections.sort(bundleInfos);
+		List<BundleInfo> bundleInfos = loadBundleInfos(pluginsDirectory);
+		
 		String configContent = buildConfigContent(bundleInfos);
 
 		File configDirectory = new File(eclipseDirectory, CONFIGURATION_DIR);
@@ -161,9 +113,41 @@ public final class ConfigBuilder {
 		} catch (Exception e) {
 			throw new ConfigBuildingException("Error writing <eclipseDirectory>/configuration/config.ini file: " + configFile, e);
 		} finally {
-			closeQuietly(out);
+			IOUtils.closeQuietly(out);
 		}
 		LOGGER.log(Level.INFO, "Generating configuration/config.ini: Done " + bundleInfos.size() + " plugins configured.");
+	}
+
+	private List<BundleInfo> loadBundleInfos(File pluginsDirectory) {
+		List<BundleInfo> bundleInfos = new ArrayList<BundleInfo>();
+		for (File pluginFile : pluginsDirectory.listFiles()) {
+
+			String pluginFileName = pluginFile.getName();
+			if (!pluginFileName.endsWith(".jar")) {
+				// Skip non jars
+				LOGGER.log(Level.FINE, "Skipping non jar: " + pluginFileName);
+			} else {
+				BundleInfo bundleInfo = bundleInfoLoader.loadBundleInfo(pluginFile);
+				if (bundleInfo == null) {
+					LOGGER.log(Level.FINE, "Skipping non bundle jar: " + pluginFile);
+				} else if (shouldExcludeBundle(bundleInfo)) {
+					LOGGER.log(Level.FINE, "Skipping excluded bundle : " + bundleInfo);
+				} else {
+					LOGGER.log(Level.FINE, "Adding : " + bundleInfo);
+					bundleInfos.add(bundleInfo);
+				}
+			}
+
+		}
+		// Sort bundle infos in alphabetical order to make config.ini more
+		// readable by humans
+		Collections.sort(bundleInfos);
+		return bundleInfos;
+	}
+
+	private boolean shouldExcludeBundle(BundleInfo bundleInfo) {
+		// Exclude osgi framework
+		return bundleInfo.getBundleName().equals("org.eclipse.osgi");
 	}
 
 	private String buildConfigContent(List<BundleInfo> bundleInfos) {
@@ -187,83 +171,6 @@ public final class ConfigBuilder {
 		return configBuilder.toString();
 	}
 
-	private static void closeQuietly(Closeable closeable) {
-		if (closeable == null) {
-			return;
-		}
-		try {
-			closeable.close();
-		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "error closing closeable.", e);
-		}
-	}
-
-	private BundleInfo bundleInfo(File pluginFile) {
-		String pluginFileName = pluginFile.getName();
-		if (!pluginFileName.endsWith(".jar")) {
-			// Skip non jars
-			LOGGER.log(Level.FINE, "Skipping non jar: " + pluginFileName);
-			return null;
-		} else if (pluginFileName.startsWith("org.eclipse.osgi_")) {
-			// Skip osgi framework
-			LOGGER.log(Level.FINE, "Skipping osgi framework jar: " + pluginFileName);			
-			return null;
-		} else {
-			// find if it's a fragment or bundle
-			Manifest manifest = loadManifest(pluginFile);
-			if (manifest == null) {
-				LOGGER.log(Level.FINE, "Skipping jar wihtout manifest: " + pluginFileName);
-				return null;
-			}
-			String symbolicName = symbolicName(manifest);
-			if (symbolicName == null) {
-				LOGGER.log(Level.FINE, "Skipping jar wihtout Bundle names: " + pluginFileName);
-			}
-
-			boolean fragment = manifest.getMainAttributes().getValue(FRAGMENT_HOST) != null;
-			BundleInfo bundleInfo = new BundleInfo(pluginFileName, symbolicName, fragment);
-			LOGGER.log(Level.FINE, "Found : " + bundleInfo);
-			return bundleInfo;
-		}
-	}
-
-	private String symbolicName(Manifest manifest) {
-		String symbolicName = manifest.getMainAttributes().getValue(BUNDLE_SYMBOLIC_NAME);
-		if (symbolicName == null) {
-			return null;
-		}
-
-		// Remove the configuration part (;singleton:=true...)
-		int semColonIndex = symbolicName.indexOf(";");
-		if (semColonIndex != -1) {
-			symbolicName = symbolicName.substring(0, semColonIndex);
-		}
-		symbolicName = symbolicName.trim();
-		return symbolicName;
-	}
-
-	private Manifest loadManifest(File jarFile) {
-		FileInputStream fis = null;
-		ZipInputStream zis = null;
-		try {
-			fis = new FileInputStream(jarFile);
-			zis = new ZipInputStream(fis);
-
-			ZipEntry entry;
-			while ((entry = zis.getNextEntry()) != null) {
-				if (entry.getName().equals("META-INF/MANIFEST.MF")) {
-					return new Manifest(zis);
-				}
-			}
-			return null;
-		} catch (IOException e) {
-			throw new ConfigBuildingException("Error loading manifest information for " + jarFile, e);
-		} finally {
-			closeQuietly(fis);
-			closeQuietly(zis);
-		}
-	}
-
 	/**
 	 * Build configuration/config.ini file from the list of plugins in an
 	 * "eclipse" directory.
@@ -275,39 +182,43 @@ public final class ConfigBuilder {
 		if (args.length < 1) {
 			System.out.println("usage:");
 			System.out.println("\tequinox-config-builder <eclipseDirectory> [<defaultStartLevel> [<bundleStartLevelsPropertyFile>]]");
-			System.out.println("\teclipseDirectory: the eclipse directory that should contains a plugins subdirectory and where configuration/config.ini will be generated.");
-			System.out.println("\tdefaultStartLevel: the value to use for osgi.bundles.defaultStartLevel. When not specified defaults to "+DEFAULT_DEFAULT_START_LEVEL);
-			System.out.println("\tbundleStartLevelsPropertyFile: a property file to specify start level for bundles that should not use defaultStartLevel.");
-			System.out.println("\t\t The file should use bundle symbolic name as key and start level as value e.g. org.eclipse.equinox.common=2");
+			System.out
+					.println("\teclipseDirectory: the eclipse directory that should contains a plugins subdirectory and where configuration/config.ini will be generated.");
+			System.out.println("\tdefaultStartLevel: the value to use for osgi.bundles.defaultStartLevel. When not specified defaults to "
+					+ DEFAULT_DEFAULT_START_LEVEL);
+			System.out
+					.println("\tbundleStartLevelsPropertyFile: a property file to specify start level for bundles that should not use defaultStartLevel.");
+			System.out
+					.println("\t\t The file should use bundle symbolic name as key and start level as value e.g. org.eclipse.equinox.common=2");
 			return;
 		}
 
 		File eclipseDirectory = new File(args[0]);
-		System.out.println("equinox-config-builder:");
-		System.out.println("\teclipseDirectory: " + eclipseDirectory);
+		System.out.println("equinox-config-builder");
+		System.out.println("eclipseDirectory: " + eclipseDirectory);
 		int defaultStartLevel = 4;
 		if (args.length >= 2) {
 			defaultStartLevel = Integer.parseInt(args[1]);
 		}
-		System.out.println("\tdefaultStartLevel: " + defaultStartLevel);
+		System.out.println("defaultStartLevel: " + defaultStartLevel);
 
 		Map<String, Integer> bundleStartLevels;
 		if (args.length >= 3) {
 			Properties bundleStartLevelsProperties = new Properties();
 			File bundleStartLevelsPropertyFile = new File(args[2]);
-			System.out.println("\bundleStartLevelsPropertyFile: " + bundleStartLevelsPropertyFile);
+			System.out.println("bundleStartLevelsPropertyFile: " + bundleStartLevelsPropertyFile);
 			FileInputStream fis = null;
 			try {
 				fis = new FileInputStream(bundleStartLevelsPropertyFile);
 				bundleStartLevelsProperties.load(fis);
 			} finally {
-				closeQuietly(fis);
+				IOUtils.closeQuietly(fis);
 			}
 			bundleStartLevels = startLevelsMapFromProperties(bundleStartLevelsProperties);
 		} else {
 			bundleStartLevels = Collections.emptyMap();
 		}
-		
+
 		ConfigBuilder configBuilder = new ConfigBuilder(eclipseDirectory, defaultStartLevel, bundleStartLevels);
 		configBuilder.buildConfigFile();
 	}
