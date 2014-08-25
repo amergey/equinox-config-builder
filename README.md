@@ -6,7 +6,7 @@ Simple utility allowing to generate config.ini file from an "eclipse" directory.
 Build status
 ------------
 
-[![Build Status](https://api.travis-ci.org/dgageot/simplelenium.png)](https://travis-ci.org/dgageot/simplelenium)
+[![Build Status](https://api.travis-ci.org/sarod/equinox-config-builder.png)](https://travis-ci.org/sarod/equinox-config-builder)
 
 
 Usage
