@@ -23,6 +23,7 @@ Ant task usage
 
 	<taskdef resource="com/sarod/equinox/config/builder/ant/antlib.xml" classpath="equinox-config-builder-1.0.0-SNAPSHOT.jar"/>
 	<equinox-config-builder defaultstartlevel="4" eclipsedirectory="${eclipse.dir}">
+		<!-- Specify specific start level for some bundle using thir symbolic names -->
 		<bundlestartlevel bundlename="com.sarod.bundle1" startlevel="2"/>
 	</equinox-config-builder>
 	
