@@ -27,3 +27,36 @@ Ant task usage
 		<bundlestartlevel bundlename="com.sarod.bundle1" startlevel="2"/>
 	</equinox-config-builder>
 	
+	
+Build from source 
+-----------------
+	mvn clean install
+	
+<!--
+How to release to maven central
+-------------------------------
+
+1. Configure pgp
+2. Add the following to your settings.xml:
+	
+	<servers>
+		<server>
+			<id>ossrh</id>
+			<username>XXX</username>
+			<password>XXX</password>
+		</server>
+	</servers>
+
+	<profiles>
+		<profile>
+			<id>sign</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<gpg.passphrase>XXX</gpg.passphrase>
+			</properties>
+		</profile>
+	</profiles>
+	
+3. TBD-->
