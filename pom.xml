@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.sarod.equinox.config.builder</groupId>
 	<artifactId>equinox-config-builder</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 
 	<name>equinox-config-builder</name>
 	<url>https://github.com/sarod/equinox-config-builder</url>
