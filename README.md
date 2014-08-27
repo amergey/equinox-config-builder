@@ -12,7 +12,7 @@ Build status
 Command Line Usage
 ------------------
 
-	java -jar equinox-config-builder-<version>.jar <eclipseDirectory> [<defaultStartLevel> [<bundleStartLevelsPropertyFile>]]
+	java -jar equinox-config-builder-1.0.1.jar <eclipseDirectory> [<defaultStartLevel> [<bundleStartLevelsPropertyFile>]]
 
 eclipseDirectory: the eclipse directory that should contains a plugins subdirectory and where configuration/config.ini will be generated.
 defaultStartLevel: the value to use for osgi.bundles.defaultStartLevel. When not specified defaults to 4
@@ -21,7 +21,7 @@ bundleStartLevelsPropertyFile: a property file to specify start level for bundle
 Ant task usage
 ---------------
 
-	<taskdef resource="com/sarod/equinox/config/builder/ant/antlib.xml" classpath="equinox-config-builder-1.0.0-SNAPSHOT.jar"/>
+	<taskdef resource="com/sarod/equinox/config/builder/ant/antlib.xml" classpath="equinox-config-builder-1.0.1.jar"/>
 	<equinox-config-builder defaultstartlevel="4" eclipsedirectory="${eclipse.dir}">
 		<!-- Specify specific start level for some bundle using thir symbolic names -->
 		<bundlestartlevel bundlename="com.sarod.bundle1" startlevel="2"/>
