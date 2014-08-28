@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.sarod.equinox.config.builder</groupId>
 	<artifactId>equinox-config-builder</artifactId>
-	<version>1.0.2-SNAPSHOT</version>	
+	<version>1.0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>equinox-config-builder</name>
@@ -125,6 +125,14 @@
 				<version>2.2.2</version>
 				<configuration>
 					<arguments>-Dgpg.passphrase=${gpg.passphrase}</arguments>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eluder.coveralls</groupId>
+				<artifactId>coveralls-maven-plugin</artifactId>
+				<version>2.2.0</version>
+				<configuration>
+					<!-- repoToken not needed from travis<repoToken>yourcoverallsprojectrepositorytoken</repoToken> -->
 				</configuration>
 			</plugin>
 		</plugins>
