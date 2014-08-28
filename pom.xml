@@ -9,6 +9,9 @@
 	<name>equinox-config-builder</name>
 	<url>https://github.com/sarod/equinox-config-builder</url>
 
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 	<licenses>
 		<license>
 			<name>Eclipse Public License - v 1.0</name>
