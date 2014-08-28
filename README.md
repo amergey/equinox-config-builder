@@ -1,36 +1,48 @@
-equinox-config-builder
-======================
+# equinox-config-builder
 
-Simple utility allowing to generate config.ini file from an "eclipse" directory.
 
-Build status
-------------
+equinox-config-builder is a simple utility allowing to build/generate equinox config.ini file from an "eclipse" directory containing a list of plugins and fragments.
+
+## Build status
 
 [![Build Status](https://api.travis-ci.org/sarod/equinox-config-builder.png)](https://travis-ci.org/sarod/equinox-config-builder)
 [![Coverage Status](https://img.shields.io/coveralls/sarod/equinox-config-builder.svg)](https://coveralls.io/r/sarod/equinox-config-builder)
 
-Command Line Usage
-------------------
+## Usage
 
-	java -jar equinox-config-builder-1.0.1.jar <eclipseDirectory> [<defaultStartLevel> [<bundleStartLevelsPropertyFile>]]
+### Maven coordinates
+
+```xml
+<groupId>com.sarod.equinox.config.builder</groupId>
+<artifactId>equinox-config-builder</artifactId>
+<version>1.0.1</version>
+```
+
+### From Command Line
+
+```Shell
+java -jar equinox-config-builder-1.0.1.jar <eclipseDirectory> [<defaultStartLevel> [<bundleStartLevelsPropertyFile>]]
+```
 
 eclipseDirectory: the eclipse directory that should contains a plugins subdirectory and where configuration/config.ini will be generated.
 defaultStartLevel: the value to use for osgi.bundles.defaultStartLevel. When not specified defaults to 4
 bundleStartLevelsPropertyFile: a property file to specify start level for bundles that should not use defaultStartLevel. The property file should use bundle symbolic name as key and start level as value e.g. org.eclipse.equinox.common=2
  
-Ant task usage
----------------
+### From Ant
 
-	<taskdef resource="com/sarod/equinox/config/builder/ant/antlib.xml" classpath="equinox-config-builder-1.0.1.jar"/>
-	<equinox-config-builder defaultstartlevel="4" eclipsedirectory="${eclipse.dir}">
-		<!-- Specify specific start level for some bundle using thir symbolic names -->
-		<bundlestartlevel bundlename="com.sarod.bundle1" startlevel="2"/>
-	</equinox-config-builder>
-	
-	
-Build from source 
------------------
-	mvn clean install
+```xml
+<taskdef resource="com/sarod/equinox/config/builder/ant/antlib.xml" classpath="equinox-config-builder-1.0.1.jar"/>
+<equinox-config-builder defaultstartlevel="4" eclipsedirectory="${eclipse.dir}">
+	<!-- Optionally specify start level for some bundles using their symbolic names -->
+	<bundlestartlevel bundlename="com.sarod.bundle1" startlevel="2"/>
+</equinox-config-builder>
+```
+
+## Build 
+
+```Shell
+mvn clean install
+```
 	
 <!--
 How to release to maven central
