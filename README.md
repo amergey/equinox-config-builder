@@ -7,7 +7,7 @@ Build status
 ------------
 
 [![Build Status](https://api.travis-ci.org/sarod/equinox-config-builder.png)](https://travis-ci.org/sarod/equinox-config-builder)
-
+[![Coverage Status](https://img.shields.io/coveralls/sarod/equinox-config-builder.svg)](https://coveralls.io/r/sarod/equinox-config-builder)
 
 Command Line Usage
 ------------------
