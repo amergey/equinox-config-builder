@@ -1,10 +1,10 @@
-package com.sarod.equinox.config.builder;
+package com.sarod.equinox.config.builder.utils;
 
 import java.io.Closeable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class IOUtils {
+public class IOUtils {
 
 	private static final Logger LOGGER = Logger.getLogger(IOUtils.class.getName());
 
@@ -12,7 +12,7 @@ class IOUtils {
 		throw new AssertionError("Utility class do not instantiate");
 	}
 
-	static void closeQuietly(Closeable closeable) {
+	public static void closeQuietly(Closeable closeable) {
 		if (closeable == null) {
 			return;
 		}
