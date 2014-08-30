@@ -16,6 +16,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import com.sarod.equinox.config.builder.utils.IOUtils;
+import static com.sarod.equinox.config.builder.utils.Preconditions.*;
 
 public class BundleInfoLoader {
 
@@ -42,9 +43,8 @@ public class BundleInfoLoader {
 	 * @throws ConfigBuildingException
 	 */
 	public BundleInfo loadBundleInfo(InputStream jarInputStream, String pluginFileName) throws ConfigBuildingException {
-		if (jarInputStream == null) {
-			throw new NullPointerException("jarInputStreamStream must be not null");
-		}
+		checkNotNull(jarInputStream);
+		checkNotNull(pluginFileName);
 		if (pluginFileName == null) {
 			throw new NullPointerException("pluginFileName must be not null");
 		}
@@ -120,9 +120,7 @@ public class BundleInfoLoader {
 	 * @throws ConfigBuildingException
 	 */
 	public BundleInfo loadBundleInfo(File jarFile) throws ConfigBuildingException {
-		if (jarFile == null) {
-			throw new NullPointerException("jarFile must be not null");
-		}
+		checkNotNull(jarFile);
 		String pluginFileName = jarFile.getName();
 
 		FileInputStream fis = null;
