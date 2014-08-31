@@ -1,0 +1,14 @@
+<project name="ant-test" default="generate-config" basedir=".">
+
+
+<target name="generate-config">
+
+	<taskdef resource="com/sarod/equinox/config/builder/ant/antlib.xml"/>
+
+	<equinox-config-builder eclipsedirectory="${war.tmp.dir}/WEB-INF/"  defaultstartlevel="4">
+		<bundlestartlevel bundlename="com.sarod.test.bundle2" startlevel="2"/>
+	</equinox-config-builder>
+	
+</target>
+
+</prokect>
