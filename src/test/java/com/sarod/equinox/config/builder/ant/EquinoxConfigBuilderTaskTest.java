@@ -22,6 +22,7 @@ public class EquinoxConfigBuilderTaskTest {
 	private Project project;
 	private BuildEvent buildFinishedEvent;
 	private File targetUnzipped;
+	private File eclipseDir;
 
 	
 	@Before
@@ -29,8 +30,10 @@ public class EquinoxConfigBuilderTaskTest {
 		
 		
 		targetUnzipped = Files.createTempDir();
+		
 		FileUtils.unzip(getClass().getResourceAsStream("ant-test.zip"), targetUnzipped);
 
+		eclipseDir = new File(targetUnzipped, "eclipse");
 		// FIXME we should use BuildFileRule when it's available in ant release
 
 
@@ -40,6 +43,7 @@ public class EquinoxConfigBuilderTaskTest {
 		File antFile = new File(targetUnzipped, "build.xml");
 //		project.setProperty("ant.processid", ProcessUtil.getProcessId("<Process>"));
 		project.setProperty("ant.threadname", Thread.currentThread().getName());
+		project.setProperty("eclipse.dir", eclipseDir.getAbsolutePath());
 		project.setUserProperty("ant.file", antFile.getAbsolutePath());
 		
 		ProjectHelper.configureProject(project, antFile);
@@ -52,7 +56,7 @@ public class EquinoxConfigBuilderTaskTest {
 	@Test
 	public void testAnt() throws IOException {
 		project.executeTarget("generate-config");
-		File configFile = new File(targetUnzipped, "eclipse/configuration/config.ini");
+		File configFile = new File(eclipseDir, "configuration/config.ini");
 		System.out.println(targetUnzipped);
 		assertTrue(configFile.exists());
 

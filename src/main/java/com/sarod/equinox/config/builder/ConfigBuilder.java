@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sarod.equinox.config.builder.utils.IOUtils;
+import com.sarod.equinox.config.builder.utils.Preconditions;
 
 public final class ConfigBuilder {
 
@@ -69,9 +70,7 @@ public final class ConfigBuilder {
 	}
 
 	public ConfigBuilder(File eclipseDirectory, int defaultStartLevel, Map<String, Integer> bundleStartLevels) {
-		if (eclipseDirectory == null) {
-			throw new NullPointerException("eclipseDirectory should not be null");
-		}
+		Preconditions.checkNotNull(eclipseDirectory);
 		if (!eclipseDirectory.exists() || !eclipseDirectory.isDirectory() || !eclipseDirectory.canRead()) {
 			throw new IllegalArgumentException("eclipseDirectory " + eclipseDirectory + " is not a readable directory.");
 		}
