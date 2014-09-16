@@ -1,8 +1,7 @@
 # equinox-config-builder
 
-
-equinox-config-builder is a simple utility to generate equinox config.ini file.
-More precisely it allows to generate the osgi.budnles property from an "eclipse" directory containing a list of plugins and fragments.
+equinox-config-builder is a simple utility to generate [equinox config.ini](http://www.eclipse.org/equinox/documents/quickstart-framework.php).
+More precisely it allows to generate the osgi.bundles property from an "eclipse" directory containing a list of plugins and fragments.
 
 ## Build status
 
