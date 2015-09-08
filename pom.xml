@@ -133,7 +133,7 @@
 			<plugin>
 				<groupId>org.eluder.coveralls</groupId>
 				<artifactId>coveralls-maven-plugin</artifactId>
-				<version>2.2.0</version>
+				<version>4.0.0</version>
 				<configuration>
 					<!-- repoToken not needed from travis<repoToken>yourcoverallsprojectrepositorytoken</repoToken> -->
 				</configuration>
@@ -141,7 +141,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.6.4.201312101107</version>
+				<version>0.7.5.201505241946</version>
 				<executions>
 					<execution>
 						<id>prepare-agent</id>
@@ -178,7 +178,7 @@
 		<developer>
 			<id>sarod</id>
 			<name>Sébastien Arod</name>
-			<email>sarod@users.noreply.github.com</email>
+			<email>sbnarod@gmail.com</email>
 			<roles>
 				<role>architect</role>
 				<role>developer</role>
