@@ -36,7 +36,7 @@ public class ConfigWriterTest {
 				"osgi.bundles=bundle1@start,\\\n" + 
 				"bundle2@start,\\\n" + 
 				"fragment1,\\\n" + 
-				"org.eclipse.equinox.servletbridge.extensionbundle";
+				"org.eclipse.rap.servletbridge.extensionbundle";
 
 		assertEquals(expectedResult, result);
 	}
@@ -59,7 +59,7 @@ public class ConfigWriterTest {
 				"bundle2@5:start,\\\n" + 
 				"bundle3@start,\\\n" + 
 				"fragment1,\\\n" + 
-				"org.eclipse.equinox.servletbridge.extensionbundle";
+				"org.eclipse.rap.servletbridge.extensionbundle";
 		assertEquals(expectedResult, result);
 	}
 }

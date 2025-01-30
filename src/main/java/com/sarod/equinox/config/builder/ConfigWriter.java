@@ -36,7 +36,7 @@ public class ConfigWriter {
 			}
 			configBuilder.append(",\\\n");
 		}
-		configBuilder.append("org.eclipse.equinox.servletbridge.extensionbundle");
+		configBuilder.append("org.eclipse.rap.servletbridge.extensionbundle");
 		return configBuilder.toString();
 
 	}

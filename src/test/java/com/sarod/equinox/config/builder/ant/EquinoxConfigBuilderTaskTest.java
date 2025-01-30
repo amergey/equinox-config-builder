@@ -66,6 +66,6 @@ public class EquinoxConfigBuilderTaskTest {
 				"osgi.bundles=com.sarod.test.bundle@start,\\\n" + 
 				"com.sarod.test.bundle2@2:start,\\\n" + 
 				"com.sarod.test.fragment,\\\n" + 
-				"org.eclipse.equinox.servletbridge.extensionbundle", content);
+				"org.eclipse.rap.servletbridge.extensionbundle", content);
 	}
 }

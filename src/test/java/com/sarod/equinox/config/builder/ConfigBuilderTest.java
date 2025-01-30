@@ -42,6 +42,6 @@ public class ConfigBuilderTest {
 		String content = Files.toString(configFile, Charsets.UTF_8);
 		assertEquals("#Product Runtime Configuration File\n" + "osgi.bundles.defaultStartLevel=4\n"
 				+ "osgi.bundles=com.sarod.test.bundle@start,\\\n" + "com.sarod.test.fragment,\\\n"
-				+ "org.eclipse.equinox.servletbridge.extensionbundle", content);
+				+ "org.eclipse.rap.servletbridge.extensionbundle", content);
 	}
 }
